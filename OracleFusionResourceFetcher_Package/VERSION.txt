@@ -1,0 +1,20 @@
+Oracle Fusion Resource Fetcher
+Version: 1.0
+Build Date: 2025-08-18 19:38:59
+Platform: Cross-Platform (Windows, macOS, Linux)
+Dependencies: None (Standalone)
+
+Features:
+- Fetch Oracle Fusion project resources
+- Filter and search functionality
+- Export to CSV
+- Update person information from HCM
+- Web-based interface
+- No installation required
+
+System Requirements:
+- Windows 10/11, macOS 10.14+, or Linux
+- Internet connection
+- Oracle Fusion account with appropriate permissions
+
+For support, contact your system administrator.
