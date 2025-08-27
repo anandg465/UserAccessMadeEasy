@@ -3,6 +3,7 @@ from typing import Optional, List, Dict, Any
 from datetime import datetime
 from enum import Enum
 
+
 class UserBase(BaseModel):
     username: str
     email: EmailStr
@@ -12,19 +13,24 @@ class UserBase(BaseModel):
     is_active: Optional[bool] = True
     user_category: Optional[str] = None
 
+
 class UserCreate(UserBase):
     password: str
+
 
 class UserCreateWithOracle(BaseModel):
     user: UserCreate
     oracle_username: str
     oracle_password: str
 
+
 class UserResponse(UserBase):
     id: int
     guid: Optional[str]
+
     class Config:
         orm_mode = True
+
 
 class LogResponse(BaseModel):
     id: int
@@ -33,15 +39,19 @@ class LogResponse(BaseModel):
     status: str
     message: Optional[str]
     timestamp: datetime
+
     class Config:
         orm_mode = True
+
 
 class RoleResponse(BaseModel):
     id: int
     name: str
     description: Optional[str]
+
     class Config:
         orm_mode = True
+
 
 # New schemas for Oracle Fusion HCM User Management
 class OracleConnectionConfig(BaseModel):
@@ -49,9 +59,11 @@ class OracleConnectionConfig(BaseModel):
     username: str = Field(..., description="Oracle API username")
     password: str = Field(..., description="Oracle API password")
 
+
 class UserDetailRequest(BaseModel):
     username: str = Field(..., description="Username to get details for")
     oracle_config: OracleConnectionConfig
+
 
 class UserDetailResponse(BaseModel):
     username: str
@@ -66,30 +78,38 @@ class UserDetailResponse(BaseModel):
     created_date: Optional[str]
     last_modified: Optional[str]
 
+
 class RoleAssignmentRequest(BaseModel):
     username: str = Field(..., description="Username to assign role to")
     role_name: str = Field(..., description="Role name to assign")
     oracle_config: OracleConnectionConfig
+
 
 class RoleRemovalRequest(BaseModel):
     username: str = Field(..., description="Username to remove role from")
     role_name: str = Field(..., description="Role name to remove")
     oracle_config: OracleConnectionConfig
 
+
 class BulkRoleAssignmentRequest(BaseModel):
     assignments: List[RoleAssignmentRequest]
     oracle_config: OracleConnectionConfig
 
+
 class DataSecurityContextRequest(BaseModel):
-    username: str = Field(..., description="Username to assign data security context to")
+    username: str = Field(
+        ..., description="Username to assign data security context to"
+    )
     role_name: str = Field(..., description="Role name")
     data_security_context: str = Field(..., description="Data security context name")
     data_security_value: str = Field(..., description="Data security context value")
     oracle_config: OracleConnectionConfig
 
+
 class BulkDataSecurityRequest(BaseModel):
     assignments: List[DataSecurityContextRequest]
     oracle_config: OracleConnectionConfig
+
 
 class AORAssignmentRequest(BaseModel):
     username: str = Field(..., description="Username to assign AOR to")
@@ -97,19 +117,26 @@ class AORAssignmentRequest(BaseModel):
     aor_type: Optional[str] = Field(None, description="Type of AOR")
     oracle_config: OracleConnectionConfig
 
+
 class AORRemovalRequest(BaseModel):
     username: str = Field(..., description="Username to remove AOR from")
     aor_id: str = Field(..., description="Area of Responsibility ID")
     oracle_config: OracleConnectionConfig
 
+
 class BulkAORRequest(BaseModel):
     assignments: List[AORAssignmentRequest]
     oracle_config: OracleConnectionConfig
 
+
 class ExcelUploadRequest(BaseModel):
     file_content: str = Field(..., description="Base64 encoded Excel file content")
-    operation_type: str = Field(..., description="Type of operation: role_assignment, data_security, aor_assignment")
+    operation_type: str = Field(
+        ...,
+        description="Type of operation: role_assignment, data_security, aor_assignment",
+    )
     oracle_config: OracleConnectionConfig
+
 
 class ExcelUploadResponse(BaseModel):
     success_count: int
@@ -117,10 +144,12 @@ class ExcelUploadResponse(BaseModel):
     errors: List[Dict[str, Any]]
     processed_records: List[Dict[str, Any]]
 
+
 class PasswordResetRequest(BaseModel):
     username: str = Field(..., description="Username to reset password for")
     new_password: str = Field(..., description="New password")
     oracle_config: OracleConnectionConfig
+
 
 class PasswordUpdateRequest(BaseModel):
     username: str = Field(..., description="Username to update password for")
@@ -128,13 +157,16 @@ class PasswordUpdateRequest(BaseModel):
     new_password: str = Field(..., description="New password")
     oracle_config: OracleConnectionConfig
 
+
 class UserSearchRequest(BaseModel):
     search_criteria: Dict[str, Any] = Field(..., description="Search criteria")
     oracle_config: OracleConnectionConfig
 
+
 class AORSearchRequest(BaseModel):
     search_criteria: Dict[str, Any] = Field(..., description="Search criteria for AOR")
     oracle_config: OracleConnectionConfig
+
 
 class OperationStatus(BaseModel):
     success: bool
@@ -142,11 +174,13 @@ class OperationStatus(BaseModel):
     data: Optional[Dict[str, Any]] = None
     error: Optional[str] = None
 
+
 class BulkOperationResponse(BaseModel):
     total_operations: int
     successful_operations: int
     failed_operations: int
     results: List[OperationStatus]
+
 
 # Configuration schemas
 class AppConfig(BaseModel):
@@ -156,10 +190,11 @@ class AppConfig(BaseModel):
         "primary_color": "#1976d2",
         "secondary_color": "#dc004e",
         "background_color": "#f5f5f5",
-        "text_color": "#333333"
+        "text_color": "#333333",
     }
     logo_url: Optional[str] = None
     company_name: Optional[str] = None
+
 
 class ClientBranding(BaseModel):
     primary_color: str = "#1976d2"
@@ -169,4 +204,4 @@ class ClientBranding(BaseModel):
     text_color: str = "#333333"
     logo_url: Optional[str] = None
     company_name: Optional[str] = None
-    favicon_url: Optional[str] = None 
+    favicon_url: Optional[str] = None

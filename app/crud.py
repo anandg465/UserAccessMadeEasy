@@ -4,8 +4,10 @@ from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+
 def get_password_hash(password):
     return pwd_context.hash(password)
+
 
 def create_user(db: Session, user: schemas.UserCreate):
     db_user = models.User(
@@ -16,19 +18,25 @@ def create_user(db: Session, user: schemas.UserCreate):
         display_name=user.display_name,
         is_active=user.is_active,
         user_category=user.user_category,
-        hashed_password=get_password_hash(user.password)
+        hashed_password=get_password_hash(user.password),
     )
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
     return db_user
 
+
 def get_user_by_username(db: Session, username: str):
     return db.query(models.User).filter(models.User.username == username).first()
 
-def create_log(db: Session, action: str, username: str, status: str, message: str = None):
-    db_log = models.Log(action=action, username=username, status=status, message=message)
+
+def create_log(
+    db: Session, action: str, username: str, status: str, message: str = None
+):
+    db_log = models.Log(
+        action=action, username=username, status=status, message=message
+    )
     db.add(db_log)
     db.commit()
     db.refresh(db_log)
-    return db_log 
+    return db_log
