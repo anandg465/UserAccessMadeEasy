@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oracle Fusion HCM User Management</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <i class="fas fa-users-cog logo-icon"></i>
+                    <h1 class="app-title">Oracle Fusion HCM</h1>
+                    <span class="app-subtitle">User Management Portal</span>
+                </div>
+                <div class="header-actions">
+                    <button id="settingsBtn" class="btn btn-secondary">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </button>
+                    <button id="helpBtn" class="btn btn-secondary">
+                        <i class="fas fa-question-circle"></i>
+                        Help
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Connection Configuration -->
+        <div id="connectionConfig" class="config-panel">
+            <div class="config-content">
+                <h2><i class="fas fa-plug"></i> Oracle Connection</h2>
+                <form id="connectionForm" class="config-form">
+                    <div class="form-group">
+                        <label for="instanceUrl">Instance URL</label>
+                        <input type="url" id="instanceUrl" name="instanceUrl" required 
+                               placeholder="https://your-instance.oraclecloud.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" required 
+                               placeholder="Your Oracle API username">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required 
+                               placeholder="Your Oracle API password">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Connect
+                        </button>
+                        <button type="button" id="testConnection" class="btn btn-secondary">
+                            <i class="fas fa-vial"></i>
+                            Test Connection
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Main Application (hidden until connected) -->
+        <div id="mainApp" class="main-app" style="display: none;">
+            <!-- Navigation -->
+            <nav class="sidebar">
+                <div class="nav-section">
+                    <h3>User Management</h3>
+                    <ul class="nav-menu">
+                        <li><a href="#dashboard" class="nav-link active" data-section="dashboard">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a></li>
+                        <li><a href="#user-details" class="nav-link" data-section="user-details">
+                            <i class="fas fa-user"></i> User Details
+                        </a></li>
+                        <li><a href="#role-management" class="nav-link" data-section="role-management">
+                            <i class="fas fa-user-tag"></i> Role Management
+                        </a></li>
+                        <li><a href="#data-security" class="nav-link" data-section="data-security">
+                            <i class="fas fa-shield-alt"></i> Data Security
+                        </a></li>
+                        <li><a href="#aor-management" class="nav-link" data-section="aor-management">
+                            <i class="fas fa-sitemap"></i> Areas of Responsibility
+                        </a></li>
+                    </ul>
+                </div>
+                
+                <div class="nav-section">
+                    <h3>Bulk Operations</h3>
+                    <ul class="nav-menu">
+                        <li><a href="#bulk-upload" class="nav-link" data-section="bulk-upload">
+                            <i class="fas fa-upload"></i> Excel Upload
+                        </a></li>
+                        <li><a href="#bulk-operations" class="nav-link" data-section="bulk-operations">
+                            <i class="fas fa-tasks"></i> Bulk Operations
+                        </a></li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h3>System</h3>
+                    <ul class="nav-menu">
+                        <li><a href="#search" class="nav-link" data-section="search">
+                            <i class="fas fa-search"></i> Search
+                        </a></li>
+                        <li><a href="#password-management" class="nav-link" data-section="password-management">
+                            <i class="fas fa-key"></i> Password Management
+                        </a></li>
+                        <li><a href="#logs" class="nav-link" data-section="logs">
+                            <i class="fas fa-list-alt"></i> Activity Logs
+                        </a></li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Dashboard Section -->
+                <section id="dashboard" class="content-section active">
+                    <div class="section-header">
+                        <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+                        <p>Overview of Oracle Fusion HCM User Management</p>
+                    </div>
+                    
+                    <div class="dashboard-grid">
+                        <div class="dashboard-card">
+                            <div class="card-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="card-content">
+                                <h3>Total Users</h3>
+                                <p class="card-value" id="totalUsers">-</p>
+                                <button class="btn btn-sm btn-primary" onclick="loadUserCount()">
+                                    <i class="fas fa-sync"></i> Refresh
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="dashboard-card">
+                            <div class="card-icon">
+                                <i class="fas fa-user-tag"></i>
+                            </div>
+                            <div class="card-content">
+                                <h3>Active Roles</h3>
+                                <p class="card-value" id="activeRoles">-</p>
+                                <button class="btn btn-sm btn-primary" onclick="loadRoleCount()">
+                                    <i class="fas fa-sync"></i> Refresh
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="dashboard-card">
+                            <div class="card-icon">
+                                <i class="fas fa-sitemap"></i>
+                            </div>
+                            <div class="card-content">
+                                <h3>Areas of Responsibility</h3>
+                                <p class="card-value" id="totalAORs">-</p>
+                                <button class="btn btn-sm btn-primary" onclick="loadAORCount()">
+                                    <i class="fas fa-sync"></i> Refresh
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="dashboard-card">
+                            <div class="card-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="card-content">
+                                <h3>Recent Activities</h3>
+                                <p class="card-value" id="recentActivities">-</p>
+                                <button class="btn btn-sm btn-primary" onclick="loadRecentActivities()">
+                                    <i class="fas fa-sync"></i> Refresh
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="quick-actions">
+                        <h3>Quick Actions</h3>
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" onclick="showSection('user-details')">
+                                <i class="fas fa-user"></i> Get User Details
+                            </button>
+                            <button class="btn btn-primary" onclick="showSection('role-management')">
+                                <i class="fas fa-user-plus"></i> Assign Role
+                            </button>
+                            <button class="btn btn-primary" onclick="showSection('bulk-upload')">
+                                <i class="fas fa-upload"></i> Bulk Upload
+                            </button>
+                            <button class="btn btn-primary" onclick="showSection('search')">
+                                <i class="fas fa-search"></i> Search Users
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- User Details Section -->
+                <section id="user-details" class="content-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-user"></i> User Details</h2>
+                        <p>Get comprehensive user information including roles and data security</p>
+                    </div>
+                    
+                    <div class="search-panel">
+                        <div class="search-form">
+                            <input type="text" id="userSearchInput" placeholder="Enter username..." class="search-input">
+                            <button onclick="getUserDetails()" class="btn btn-primary">
+                                <i class="fas fa-search"></i> Get Details
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="userDetailsResult" class="result-panel" style="display: none;">
+                        <!-- User details will be populated here -->
+                    </div>
+                </section>
+
+                <!-- Role Management Section -->
+                <section id="role-management" class="content-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-user-tag"></i> Role Management</h2>
+                        <p>Assign and remove roles from users</p>
+                    </div>
+                    
+                    <div class="management-tabs">
+                        <button class="tab-btn active" data-tab="assign-role">Assign Role</button>
+                        <button class="tab-btn" data-tab="remove-role">Remove Role</button>
+                        <button class="tab-btn" data-tab="bulk-roles">Bulk Operations</button>
+                    </div>
+
+                    <div class="tab-content">
+                        <!-- Assign Role Tab -->
+                        <div id="assign-role" class="tab-panel active">
+                            <form id="assignRoleForm" class="management-form">
+                                <div class="form-group">
+                                    <label for="assignUsername">Username</label>
+                                    <input type="text" id="assignUsername" required placeholder="Enter username">
+                                </div>
+                                <div class="form-group">
+                                    <label for="assignRoleName">Role Name</label>
+                                    <input type="text" id="assignRoleName" required placeholder="Enter role name">
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Assign Role
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Remove Role Tab -->
+                        <div id="remove-role" class="tab-panel">
+                            <form id="removeRoleForm" class="management-form">
+                                <div class="form-group">
+                                    <label for="removeUsername">Username</label>
+                                    <input type="text" id="removeUsername" required placeholder="Enter username">
+                                </div>
+                                <div class="form-group">
+                                    <label for="removeRoleName">Role Name</label>
+                                    <input type="text" id="removeRoleName" required placeholder="Enter role name">
+                                </div>
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-minus"></i> Remove Role
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Bulk Roles Tab -->
+                        <div id="bulk-roles" class="tab-panel">
+                            <div class="bulk-operations">
+                                <h3>Bulk Role Assignment</h3>
+                                <div class="bulk-input">
+                                    <textarea id="bulkRoleData" placeholder="Enter data in format: username,role_name (one per line)&#10;Example:&#10;john.doe,HR_MANAGER&#10;jane.smith,EMPLOYEE"></textarea>
+                                    <button onclick="bulkAssignRoles()" class="btn btn-primary">
+                                        <i class="fas fa-upload"></i> Process Bulk Assignment
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Data Security Section -->
+                <section id="data-security" class="content-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-shield-alt"></i> Data Security Context</h2>
+                        <p>Manage data security contexts for users</p>
+                    </div>
+                    
+                    <div class="management-tabs">
+                        <button class="tab-btn active" data-tab="assign-security">Assign Security Context</button>
+                        <button class="tab-btn" data-tab="bulk-security">Bulk Security Assignment</button>
+                    </div>
+
+                    <div class="tab-content">
+                        <div id="assign-security" class="tab-panel active">
+                            <form id="assignSecurityForm" class="management-form">
+                                <div class="form-group">
+                                    <label for="securityUsername">Username</label>
+                                    <input type="text" id="securityUsername" required placeholder="Enter username">
+                                </div>
+                                <div class="form-group">
+                                    <label for="securityRoleName">Role Name</label>
+                                    <input type="text" id="securityRoleName" required placeholder="Enter role name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="securityContext">Data Security Context</label>
+                                    <input type="text" id="securityContext" required placeholder="Enter security context">
+                                </div>
+                                <div class="form-group">
+                                    <label for="securityValue">Security Context Value</label>
+                                    <input type="text" id="securityValue" required placeholder="Enter security value">
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-shield-alt"></i> Assign Security Context
+                                </button>
+                            </form>
+                        </div>
+
+                        <div id="bulk-security" class="tab-panel">
+                            <div class="bulk-operations">
+                                <h3>Bulk Security Context Assignment</h3>
+                                <div class="bulk-input">
+                                    <textarea id="bulkSecurityData" placeholder="Enter data in format: username,role_name,security_context,security_value (one per line)&#10;Example:&#10;john.doe,HR_MANAGER,DEPARTMENT,IT&#10;jane.smith,EMPLOYEE,LOCATION,NYC"></textarea>
+                                    <button onclick="bulkAssignSecurity()" class="btn btn-primary">
+                                        <i class="fas fa-upload"></i> Process Bulk Security Assignment
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Areas of Responsibility Section -->
+                <section id="aor-management" class="content-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-sitemap"></i> Areas of Responsibility</h2>
+                        <p>Manage areas of responsibility for users</p>
+                    </div>
+                    
+                    <div class="management-tabs">
+                        <button class="tab-btn active" data-tab="assign-aor">Assign AOR</button>
+                        <button class="tab-btn" data-tab="remove-aor">Remove AOR</button>
+                        <button class="tab-btn" data-tab="bulk-aor">Bulk AOR Operations</button>
+                    </div>
+
+                    <div class="tab-content">
+                        <div id="assign-aor" class="tab-panel active">
+                            <form id="assignAORForm" class="management-form">
+                                <div class="form-group">
+                                    <label for="aorUsername">Username</label>
+                                    <input type="text" id="aorUsername" required placeholder="Enter username">
+                                </div>
+                                <div class="form-group">
+                                    <label for="aorName">AOR Name</label>
+                                    <input type="text" id="aorName" required placeholder="Enter AOR name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="aorType">AOR Type</label>
+                                    <select id="aorType">
+                                        <option value="GENERAL">General</option>
+                                        <option value="HR">Human Resources</option>
+                                        <option value="FINANCE">Finance</option>
+                                        <option value="IT">Information Technology</option>
+                                        <option value="OPERATIONS">Operations</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Assign AOR
+                                </button>
+                            </form>
+                        </div>
+
+                        <div id="remove-aor" class="tab-panel">
+                            <form id="removeAORForm" class="management-form">
+                                <div class="form-group">
+                                    <label for="removeAORUsername">Username</label>
+                                    <input type="text" id="removeAORUsername" required placeholder="Enter username">
+                                </div>
+                                <div class="form-group">
+                                    <label for="removeAORId">AOR ID</label>
+                                    <input type="text" id="removeAORId" required placeholder="Enter AOR ID">
+                                </div>
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-minus"></i> Remove AOR
+                                </button>
+                            </form>
+                        </div>
+
+                        <div id="bulk-aor" class="tab-panel">
+                            <div class="bulk-operations">
+                                <h3>Bulk AOR Assignment</h3>
+                                <div class="bulk-input">
+                                    <textarea id="bulkAORData" placeholder="Enter data in format: username,aor_name,aor_type (one per line)&#10;Example:&#10;john.doe,HR_DEPARTMENT,HR&#10;jane.smith,IT_SUPPORT,IT"></textarea>
+                                    <button onclick="bulkAssignAORs()" class="btn btn-primary">
+                                        <i class="fas fa-upload"></i> Process Bulk AOR Assignment
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Excel Upload Section -->
+                <section id="bulk-upload" class="content-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-upload"></i> Excel Upload</h2>
+                        <p>Upload Excel files for bulk operations</p>
+                    </div>
+                    
+                    <div class="upload-panel">
+                        <div class="upload-form">
+                            <div class="form-group">
+                                <label for="operationType">Operation Type</label>
+                                <select id="operationType" required>
+                                    <option value="">Select operation type</option>
+                                    <option value="role_assignment">Role Assignment</option>
+                                    <option value="data_security">Data Security Context</option>
+                                    <option value="aor_assignment">Area of Responsibility Assignment</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="excelFile">Excel File</label>
+                                <input type="file" id="excelFile" accept=".xlsx,.xls" required>
+                                <small>Supported formats: .xlsx, .xls</small>
+                            </div>
+                            
+                            <button onclick="uploadExcelFile()" class="btn btn-primary">
+                                <i class="fas fa-upload"></i> Upload and Process
+                            </button>
+                        </div>
+                        
+                        <div class="upload-templates">
+                            <h3>Download Templates</h3>
+                            <div class="template-buttons">
+                                <button onclick="downloadTemplate('role_assignment')" class="btn btn-secondary">
+                                    <i class="fas fa-download"></i> Role Assignment Template
+                                </button>
+                                <button onclick="downloadTemplate('data_security')" class="btn btn-secondary">
+                                    <i class="fas fa-download"></i> Data Security Template
+                                </button>
+                                <button onclick="downloadTemplate('aor_assignment')" class="btn btn-secondary">
+                                    <i class="fas fa-download"></i> AOR Assignment Template
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="uploadResult" class="result-panel" style="display: none;">
+                        <!-- Upload results will be displayed here -->
+                    </div>
+                </section>
+
+                <!-- Search Section -->
+                <section id="search" class="content-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-search"></i> Search</h2>
+                        <p>Search users and areas of responsibility</p>
+                    </div>
+                    
+                    <div class="search-panel">
+                        <div class="search-tabs">
+                            <button class="tab-btn active" data-tab="user-search">User Search</button>
+                            <button class="tab-btn" data-tab="aor-search">AOR Search</button>
+                        </div>
+                        
+                        <div class="tab-content">
+                            <div id="user-search" class="tab-panel active">
+                                <form id="userSearchForm" class="search-form">
+                                    <div class="form-group">
+                                        <label for="searchUsername">Username</label>
+                                        <input type="text" id="searchUsername" placeholder="Enter username">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="searchEmail">Email</label>
+                                        <input type="email" id="searchEmail" placeholder="Enter email">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="searchActive">Active Status</label>
+                                        <select id="searchActive">
+                                            <option value="">All</option>
+                                            <option value="true">Active</option>
+                                            <option value="false">Inactive</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-search"></i> Search Users
+                                    </button>
+                                </form>
+                            </div>
+                            
+                            <div id="aor-search" class="tab-panel">
+                                <form id="aorSearchForm" class="search-form">
+                                    <div class="form-group">
+                                        <label for="searchAORName">AOR Name</label>
+                                        <input type="text" id="searchAORName" placeholder="Enter AOR name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="searchAORType">AOR Type</label>
+                                        <select id="searchAORType">
+                                            <option value="">All Types</option>
+                                            <option value="GENERAL">General</option>
+                                            <option value="HR">Human Resources</option>
+                                            <option value="FINANCE">Finance</option>
+                                            <option value="IT">Information Technology</option>
+                                            <option value="OPERATIONS">Operations</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-search"></i> Search AORs
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="searchResult" class="result-panel" style="display: none;">
+                        <!-- Search results will be displayed here -->
+                    </div>
+                </section>
+
+                <!-- Password Management Section -->
+                <section id="password-management" class="content-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-key"></i> Password Management</h2>
+                        <p>Reset and update user passwords</p>
+                    </div>
+                    
+                    <div class="management-tabs">
+                        <button class="tab-btn active" data-tab="reset-password">Reset Password</button>
+                        <button class="tab-btn" data-tab="update-password">Update Password</button>
+                    </div>
+
+                    <div class="tab-content">
+                        <div id="reset-password" class="tab-panel active">
+                            <form id="resetPasswordForm" class="management-form">
+                                <div class="form-group">
+                                    <label for="resetUsername">Username</label>
+                                    <input type="text" id="resetUsername" required placeholder="Enter username">
+                                </div>
+                                <div class="form-group">
+                                    <label for="newPassword">New Password</label>
+                                    <input type="password" id="newPassword" required placeholder="Enter new password">
+                                </div>
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="fas fa-key"></i> Reset Password
+                                </button>
+                            </form>
+                        </div>
+
+                        <div id="update-password" class="tab-panel">
+                            <form id="updatePasswordForm" class="management-form">
+                                <div class="form-group">
+                                    <label for="updateUsername">Username</label>
+                                    <input type="text" id="updateUsername" required placeholder="Enter username">
+                                </div>
+                                <div class="form-group">
+                                    <label for="currentPassword">Current Password</label>
+                                    <input type="password" id="currentPassword" required placeholder="Enter current password">
+                                </div>
+                                <div class="form-group">
+                                    <label for="updateNewPassword">New Password</label>
+                                    <input type="password" id="updateNewPassword" required placeholder="Enter new password">
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-key"></i> Update Password
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Logs Section -->
+                <section id="logs" class="content-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-list-alt"></i> Activity Logs</h2>
+                        <p>View recent activity and system logs</p>
+                    </div>
+                    
+                    <div class="logs-panel">
+                        <div class="logs-controls">
+                            <button onclick="loadLogs()" class="btn btn-primary">
+                                <i class="fas fa-sync"></i> Refresh Logs
+                            </button>
+                            <button onclick="clearLogs()" class="btn btn-secondary">
+                                <i class="fas fa-trash"></i> Clear Logs
+                            </button>
+                        </div>
+                        
+                        <div id="logsContent" class="logs-content">
+                            <!-- Logs will be populated here -->
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+            <div class="loading-spinner">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Processing...</p>
+            </div>
+        </div>
+
+        <!-- Notification System -->
+        <div id="notificationContainer" class="notification-container"></div>
+
+        <!-- Settings Modal -->
+        <div id="settingsModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-cog"></i> Settings</h3>
+                    <button class="modal-close" onclick="closeModal('settingsModal')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="settings-section">
+                        <h4>Application Settings</h4>
+                        <div class="form-group">
+                            <label for="appTheme">Theme</label>
+                            <select id="appTheme">
+                                <option value="default">Default</option>
+                                <option value="dark">Dark</option>
+                                <option value="light">Light</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="autoRefresh">Auto Refresh (seconds)</label>
+                            <input type="number" id="autoRefresh" min="0" max="300" value="0">
+                        </div>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <h4>Client Branding</h4>
+                        <div class="form-group">
+                            <label for="companyName">Company Name</label>
+                            <input type="text" id="companyName" placeholder="Enter company name">
+                        </div>
+                        <div class="form-group">
+                            <label for="primaryColor">Primary Color</label>
+                            <input type="color" id="primaryColor" value="#1976d2">
+                        </div>
+                        <div class="form-group">
+                            <label for="secondaryColor">Secondary Color</label>
+                            <input type="color" id="secondaryColor" value="#dc004e">
+                        </div>
+                        <div class="form-group">
+                            <label for="logoUrl">Logo URL</label>
+                            <input type="url" id="logoUrl" placeholder="Enter logo URL">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="saveSettings()" class="btn btn-primary">Save Settings</button>
+                    <button onclick="closeModal('settingsModal')" class="btn btn-secondary">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Modal -->
+        <div id="helpModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-question-circle"></i> Help & Documentation</h3>
+                    <button class="modal-close" onclick="closeModal('helpModal')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="help-section">
+                        <h4>Getting Started</h4>
+                        <p>1. Enter your Oracle Fusion instance URL and credentials</p>
+                        <p>2. Click "Connect" to establish connection</p>
+                        <p>3. Use the navigation menu to access different features</p>
+                    </div>
+                    
+                    <div class="help-section">
+                        <h4>Features</h4>
+                        <ul>
+                            <li><strong>User Details:</strong> Get comprehensive user information</li>
+                            <li><strong>Role Management:</strong> Assign and remove user roles</li>
+                            <li><strong>Data Security:</strong> Manage data security contexts</li>
+                            <li><strong>Areas of Responsibility:</strong> Assign AORs to users</li>
+                            <li><strong>Bulk Operations:</strong> Process multiple records at once</li>
+                            <li><strong>Excel Upload:</strong> Upload Excel files for bulk processing</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="help-section">
+                        <h4>Excel Templates</h4>
+                        <p>Download the appropriate template for your bulk operation:</p>
+                        <ul>
+                            <li>Role Assignment: username, role_name</li>
+                            <li>Data Security: username, role_name, security_context, security_value</li>
+                            <li>AOR Assignment: username, aor_name, aor_type</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="closeModal('helpModal')" class="btn btn-primary">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
